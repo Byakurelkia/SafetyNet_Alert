@@ -1,62 +1,127 @@
 package net.safety.model;
 
-import jakarta.persistence.*;
-
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@Entity
 public class Person {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @Column(nullable = false, updatable = false)
     private String firstName;
-    @Column(nullable = false, updatable = false)
     private String lastName;
-    @Column(nullable = false)
-    private String birthDate;
-    @Column(nullable = false)
     private String adress;
-    @Column(nullable = false)
     private String city;
-    @Column(nullable = false)
     private String mail;
-    @Column(nullable = false)
     private String phoneNumber;
-    @Column(nullable = false)
     private String zipCode;
 
-    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
-    private Set<MedicalRecord> medicalRecords;
+    public Person() {
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "fireStation_id") //ouvre une colonne fireStation_id sur la table Person
+    public Person(String firstName, String lastName, String adress, String city, String email, String phone, String zip) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.adress = adress;
+        this.city = city;
+        this.mail = email;
+        this.phoneNumber = phone;
+        this.zipCode =zip;
+    }
+
+
+    private Set<MedicalRecord> medicalRecords = new HashSet<>();
     private FireStation fireStation;
+
+
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getAdress() {
+        return adress;
+    }
+
+    public void setAdress(String adress) {
+        this.adress = adress;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public Set<MedicalRecord> getMedicalRecords() {
+        return medicalRecords;
+    }
+
+    public void setMedicalRecords(MedicalRecord medicalRecords) {
+        this.medicalRecords.add(medicalRecords);
+    }
+
+    public FireStation getFireStation() {
+        return fireStation;
+    }
+
+    public void setFireStation(FireStation fireStation) {
+        this.fireStation = fireStation;
+    }
+
+    /*@Override
+    public String toString() {
+        return "Person{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", adress='" + adress + '\'' +
+                ", city='" + city + '\'' +
+                ", mail='" + mail + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", zipCode='" + zipCode + '\'' +
+                ", medicalRecords=" + medicalRecords +
+                ", fireStation=" + fireStation +
+                '}';
+    }*/
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Person)) return false;
         Person person = (Person) o;
-        return id == person.id
-                && Objects.equals(firstName, person.firstName)
-                && Objects.equals(lastName, person.lastName)
-                && Objects.equals(birthDate, person.birthDate)
-                && Objects.equals(adress, person.adress)
-                && Objects.equals(city, person.city)
-                && Objects.equals(mail, person.mail)
-                && Objects.equals(phoneNumber, person.phoneNumber)
-                && Objects.equals(zipCode, person.zipCode)
-                && Objects.equals(medicalRecords, person.medicalRecords)
-                && Objects.equals(fireStation, person.fireStation);
+        return Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(adress, person.adress) && Objects.equals(city, person.city) && Objects.equals(mail, person.mail) && Objects.equals(phoneNumber, person.phoneNumber) && Objects.equals(zipCode, person.zipCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, birthDate,mail, phoneNumber);
+        return Objects.hash(firstName, lastName, adress, city, mail, phoneNumber, zipCode);
     }
 }
