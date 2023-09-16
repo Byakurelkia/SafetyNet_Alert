@@ -1,39 +1,68 @@
 package net.safety.model;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@Entity
 public class FireStation {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @Column(nullable = false)
-    private String adress;
-
-    @Column(nullable = false)
+    private String address ;
     private int stationNumber;
 
-    @OneToMany(mappedBy = "fireStation", fetch = FetchType.LAZY)
-    private Set<Person> persons;
+    private Set<Person> personList;
+
+
+    public FireStation() {
+    }
+
+    public FireStation(String address, int station) {
+        this.address=address;
+        this.stationNumber = station;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address=address;
+    }
+
+    public int getStationNumber() {
+        return stationNumber;
+    }
+
+    public void setStationNumber(int stationNumber) {
+        this.stationNumber = stationNumber;
+    }
+
+    public Set<Person> getPersonList() {
+        return personList;
+    }
+
+    public void setPersonList(Set<Person> personList) {
+        this.personList = personList;
+    }
+
+    /*@Override
+    public String toString() {
+        return "{Adress = " + address.toString() + " - " + "stationNumber =" + stationNumber +
+                '}';
+    }*/
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FireStation)) return false;
         FireStation that = (FireStation) o;
-        return id == that.id
-                && stationNumber == that.stationNumber
-                && Objects.equals(adress, that.adress)
-                && Objects.equals(persons, that.persons);
+        return stationNumber == that.stationNumber && Objects.equals(address, that.address) && Objects.equals(personList, that.personList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, adress, stationNumber);
+        return Objects.hash(address, stationNumber);
     }
 }

@@ -1,44 +1,89 @@
 package net.safety.model;
 
-import jakarta.persistence.*;
-
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-@Entity
 public class MedicalRecord {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @Column(updatable = false)
     private String firstName;
-    @Column(updatable = false)
     private String lastName;
-    private String birthDate;
-    private Set<String> medicaments;
+    private Date birthDate;
+
+    private List<String> medications;
     private Set<String> allergies;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "person_id")
-    private Person person;
+
+    public MedicalRecord(String firstName, String lastName, Date birthdate, List<String> medications, Set<String> allergies) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthdate;
+        this.medications = medications;
+        this.allergies = allergies;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public List<String> getMedications() {
+        return medications;
+    }
+
+    public void setMedications(List<String> medications) {
+        this.medications = medications;
+    }
+
+    public Set<String> getAllergies() {
+        return allergies;
+    }
+
+    public void setAllergies(Set<String> allergies) {
+        this.allergies = allergies;
+    }
+
+    @Override
+    public String toString() {
+        return "MedicalRecord{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", birthDate=" + birthDate +
+                ", medications=" + medications +
+                ", allergies=" + allergies +
+                '}';
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MedicalRecord)) return false;
         MedicalRecord that = (MedicalRecord) o;
-        return id == that.id && Objects.equals(firstName, that.firstName)
-                && Objects.equals(lastName, that.lastName)
-                && Objects.equals(birthDate, that.birthDate)
-                && Objects.equals(medicaments, that.medicaments)
-                && Objects.equals(allergies, that.allergies)
-                && Objects.equals(person, that.person);
+        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(birthDate, that.birthDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, birthDate);
+        return Objects.hash(firstName, lastName, birthDate);
     }
 }

@@ -7,7 +7,15 @@ import org.springframework.stereotype.Component;
 public class PersonDtoConverter {
 
     public PersonDto convert(Person from){
-        return null;
+        return new PersonDto(
+                from.getFirstName(),
+                from.getLastName(),
+                from.getMail(),
+                from.getPhoneNumber(),
+                from.getAdress(),
+                from.getZipCode(),
+                from.getCity()
+        );
     }
 
 

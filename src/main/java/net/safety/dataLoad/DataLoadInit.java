@@ -2,20 +2,20 @@ package net.safety.dataLoad;
 
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
-
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-
+@Component
 public class DataLoadInit {
 
-    private final static String str = "src/main/resources/dataSafetyNet.json";
+    private String str = "src/main/resources/dataSafetyNet.json";
 
     public DataLoadInit() { }
 
-    protected Any readerFileJSON() throws IOException {
+    public Any readerFileJSON() throws IOException {
         byte[] bytesFile = Files.readAllBytes(new File(str).toPath());
         Any any;
         try (JsonIterator iter = JsonIterator.parse(bytesFile)) {

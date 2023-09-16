@@ -97,6 +97,10 @@ public class Person {
         this.fireStation = fireStation;
     }
 
+    public void deleteFireStation(){
+        this.fireStation = null;
+    }
+
     /*@Override
     public String toString() {
         return "Person{" +
