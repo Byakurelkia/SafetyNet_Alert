@@ -1,7 +1,5 @@
 package net.safety.dto;
 
-import net.safety.model.Person;
-
 public class PersonDto {
 
     private String firstName;
@@ -11,17 +9,6 @@ public class PersonDto {
     private String mail;
     private String phoneNumber;
     private String zipCode;
-
-
-    public PersonDto(Person from){
-        this.firstName = from.getFirstName();
-        this.lastName = from.getLastName();
-        this.adress = from.getAdress();
-        this.city = from.getCity();
-        this.mail = from.getMail();
-        this.phoneNumber= from.getPhoneNumber();
-        this.zipCode = from.getZipCode();
-    }
 
     public PersonDto(String firstName, String lastName, String mail, String phoneNumber, String adress, String zipCode, String city) {
         this.firstName = firstName;
@@ -44,5 +31,61 @@ public class PersonDto {
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", zipCode='" + zipCode + '\'' +
                 '}';
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getAdress() {
+        return adress;
+    }
+
+    public void setAdress(String adress) {
+        this.adress = adress;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
     }
 }

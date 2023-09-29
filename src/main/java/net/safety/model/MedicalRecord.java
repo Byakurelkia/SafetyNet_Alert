@@ -1,9 +1,8 @@
 package net.safety.model;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import com.jsoniter.any.Any;
+
+import java.util.*;
 
 public class MedicalRecord {
 
