@@ -1,8 +1,6 @@
 package net.safety.service;
 
-import net.safety.dto.PersonDto;
-import net.safety.dto.PersonDtoConverter;
-import net.safety.dto.PersonUpdateRequest;
+import net.safety.dto.*;
 import net.safety.exception.DataLoadErrorException;
 import net.safety.exception.PersonAlreadyExistException;
 import net.safety.exception.PersonNotFoundException;
@@ -12,8 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,20 +18,23 @@ public class PersonService {
 
     private final PersonRepository personRepository;
     private final PersonDtoConverter personDtoConverter;
+    private final FireStationService fireStationService;
+    private final MedicalRecordService medicalRecordService;
     private final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
 
-    public PersonService(PersonRepository personRepository, PersonDtoConverter personDtoConverter) {
+    public PersonService(PersonRepository personRepository, PersonDtoConverter personDtoConverter, FireStationService fireStationService, MedicalRecordService medicalRecordService) {
         this.personRepository = personRepository;
         this.personDtoConverter = personDtoConverter;
+        this.fireStationService = fireStationService;
+        this.medicalRecordService = medicalRecordService;
     }
 
-
-    public Set<PersonDto> getAllPersons() {
+    public Set<PersonDto> getAllPersonsDto() {
         logger.info("getAllPersons started.");
         try {
-            return PersonRepository.listPersons.stream()
-                    .map(personDtoConverter::convert).collect(Collectors.toSet());
+            return personRepository.getAllPersons().stream()
+                    .map(personDtoConverter::convertToDto).collect(Collectors.toSet());
         } catch (DataLoadErrorException e){
             logger.error("Error when reading persons data from file !");
             throw new DataLoadErrorException("Error when reading persons data from file !");
@@ -48,22 +48,22 @@ public class PersonService {
         }catch (PersonNotFoundException e){
             throw new PersonNotFoundException("Person doesn't exist with this first and last name !");
         }
-        return personDtoConverter.convert(personFind);
+        return personDtoConverter.convertToDto(personFind);
     }
 
-    public PersonDto createPerson(Person from) {
+    public PersonDto createPerson(PersonCreateRequest from) {
         Person personToCreate;
         try {
-           personToCreate = personRepository.createPerson(from);
+           personToCreate = personRepository.createPerson(personDtoConverter.convertToPerson(from));
         }catch (PersonAlreadyExistException e){
             throw new PersonAlreadyExistException("A person with same name and last name exists already !");
         }
-        return personDtoConverter.convert(personToCreate);
+        return personDtoConverter.convertToDto(personToCreate);
     }
 
     public PersonDto updatePerson(String firstName, String lastName, PersonUpdateRequest personUpdateRequest) {
         try {
-            return personDtoConverter.convert(personRepository.updatePerson(firstName,lastName,personUpdateRequest));
+            return personDtoConverter.convertToDto(personRepository.updatePerson(firstName,lastName,personUpdateRequest));
         }catch (PersonNotFoundException e){
             throw new PersonNotFoundException("Person with first and last name : '"+ firstName + " , "
                     + lastName + " doesnt exists !");
@@ -78,4 +78,26 @@ public class PersonService {
                     ("Person with first and last name : '"+ firstName + " , " + lastName + " doesnt exists !");
         }
     }
+
+    /* ALERT SERVICES */
+/*
+    public List<String> getAllPhoneNumbersForAFireStation(int stationNumber){
+        if (fireStationService.getFireStationByNumber(stationNumber).isEmpty()){
+            logger.error("Fire station with this number doesnt exist!");
+        }
+
+        List<FireStationPersonsDto> fireStationList = fireStationService.getFireStationByNumber(stationNumber);
+        List<String> allPhoneNumbers = new ArrayList<>();
+
+
+
+        return allPhoneNumbers;
+
+    }*/
+
+    public Set<Person> getAllInfoPersons(){
+        return personRepository.personWithFullInformation();
+    }
+
+
 }

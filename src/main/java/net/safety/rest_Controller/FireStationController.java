@@ -3,7 +3,7 @@ package net.safety.rest_Controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import net.safety.dto.FireStationDto;
+import net.safety.dto.FireStationPersonsDto;
 import net.safety.model.FireStation;
 import net.safety.repository.FireStationRepository;
 import net.safety.service.FireStationService;
@@ -11,21 +11,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/firestations")
 public class FireStationController {
 
-    private final FireStationRepository fireStationRepository;
     private final FireStationService fireStationService;
+    private final FireStationRepository fireStationRepository;
 
-    public FireStationController(FireStationRepository fireStationRepository, FireStationService fireStationService) throws IOException {
-        this.fireStationRepository = fireStationRepository;
+    public FireStationController(FireStationService fireStationService, FireStationRepository fireStationRepository){
         this.fireStationService = fireStationService;
+        this.fireStationRepository = fireStationRepository;
     }
 
     //OK
@@ -33,7 +31,7 @@ public class FireStationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Fire Stations load successfully"),
                     @ApiResponse(responseCode = "500", description = "Error when loading data source")})
     @GetMapping
-    public ResponseEntity<Set<FireStationDto>> getAllStation() throws IOException {
+    public ResponseEntity<Set<FireStation>> getAllStation() {
         return ResponseEntity.ok(fireStationService.getAllFireStationsDto());
     }
 
@@ -42,7 +40,7 @@ public class FireStationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Fire Station successfully loaded"),
                     @ApiResponse(responseCode = "404", description = "Fire station doesnt exist with this number") })
     @GetMapping("/find/{stationNumber}")
-    public ResponseEntity<List<FireStationDto>> getFireStationByNumber(@PathVariable("stationNumber") int stationNumber){
+    public ResponseEntity<List<FireStation>> getFireStationByNumber(@PathVariable("stationNumber") int stationNumber){
         return ResponseEntity.ok(fireStationService.getFireStationByNumber(stationNumber));
     }
 
@@ -51,7 +49,7 @@ public class FireStationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Fires station created successfully"),
                     @ApiResponse(responseCode = "400", description = "Fire station is already exist")})
     @PostMapping
-    public ResponseEntity<FireStationDto> createFireStation(@RequestBody FireStation fireStation) {
+    public ResponseEntity<FireStation> createFireStation(@RequestBody FireStation fireStation) {
         return ResponseEntity.status(HttpStatus.CREATED).body(fireStationService.saveFireStation(fireStation));
     }
 
@@ -60,7 +58,7 @@ public class FireStationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Fire station updated successfully"),
                     @ApiResponse(responseCode = "404", description = "Fire station doesnt exist with this address") })
     @PutMapping("{address}")
-    public ResponseEntity<FireStationDto> updateFireStationNumberOfAnAddress(@PathVariable("address") String address, @RequestBody int number) {
+    public ResponseEntity<FireStation> updateFireStationNumberOfAnAddress(@PathVariable("address") String address, @RequestBody int number) {
         FireStation fireStation = new FireStation(address,number);
         return ResponseEntity.ok(fireStationService.updateFireStation(fireStation));
     }
@@ -76,5 +74,11 @@ public class FireStationController {
     }
 
 
-
+    @Operation(summary = "Request to get all fire stations with persons list")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Fire Stations with person load successfully"),
+            @ApiResponse(responseCode = "500", description = "Error when loading data source")})
+    @GetMapping("/withPersons")
+    public ResponseEntity<List<FireStationPersonsDto>> getAllFireStationsWithPersons() {
+        return ResponseEntity.ok(fireStationService.getAllFireStationsWithPersons());
+    }
 }

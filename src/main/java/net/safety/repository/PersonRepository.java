@@ -3,10 +3,12 @@ package net.safety.repository;
 
 import com.jsoniter.any.Any;
 import net.safety.dataLoad.DataLoadInit;
-import net.safety.dto.PersonUpdateRequest;
+import net.safety.dto.*;
 import net.safety.exception.DataLoadErrorException;
 import net.safety.exception.PersonAlreadyExistException;
 import net.safety.exception.PersonNotFoundException;
+import net.safety.model.FireStation;
+import net.safety.model.MedicalRecord;
 import net.safety.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +16,15 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 @Repository
 public class PersonRepository {
 
     public static Set<Person> listPersons = new HashSet<>();
+    public static Set<Person> listPersonsWithAllInformations = new HashSet<>();
     private final DataLoadInit dataLoadInit;
     private final Logger logger = LoggerFactory.getLogger(PersonRepository.class);
 
@@ -56,6 +60,15 @@ public class PersonRepository {
         logger.info("Persons Data reading completed successfully.");
     }
 
+    public Set<Person> getAllPersons(){
+        try {
+            return listPersons;
+        }catch (DataLoadErrorException e){
+            logger.error("Error when reading persons data from file !");
+            throw new DataLoadErrorException("Error when reading persons data from file !");
+    }
+    }
+
     public Person getPersonByLastAndFirstName(String firstName, String lastName){
         logger.info("getPersonByLastAndFirstName started..");
         Person person = getPerson(firstName,lastName);
@@ -85,18 +98,22 @@ public class PersonRepository {
             logger.error("Update person failed ! ");
             throw new PersonNotFoundException("Person with first and last name : '"+ firstName
                     + " , " + lastName + " doesn't exists !");
-        }else{
-            for (Person personToUpdate : listPersons){
-                if (personToUpdate.getFirstName().equals(firstName) && personToUpdate.getLastName().equals(lastName)){
-                    personToUpdate.setAdress(personUpdateRequest.getAdress());
-                    personToUpdate.setCity(personUpdateRequest.getCity());
-                    personToUpdate.setZipCode(personUpdateRequest.getZipCode());
-                    personToUpdate.setMail(personUpdateRequest.getMail());
-                    personToUpdate.setPhoneNumber(personUpdateRequest.getPhoneNumber());
-                }
+        }
+
+        Iterator<Person> iterator= listPersons.iterator();
+        while (iterator.hasNext()) {
+            Person personToUpdate = iterator.next();
+            if (personToUpdate.getFirstName().equals(firstName) && personToUpdate.getLastName().equals(lastName)) {
+                personToUpdate.setAdress(personUpdateRequest.getAdress());
+                personToUpdate.setCity(personUpdateRequest.getCity());
+                personToUpdate.setZipCode(personUpdateRequest.getZipCode());
+                personToUpdate.setMail(personUpdateRequest.getMail());
+                personToUpdate.setPhoneNumber(personUpdateRequest.getPhoneNumber());
+                logger.info("Person updated successfully ! ");
+                break;
             }
         }
-        logger.info("Person updated successfully ! ");
+
         return getPerson(firstName,lastName);
     }
 
@@ -105,9 +122,12 @@ public class PersonRepository {
             logger.error("Person Delete failed !");
             throw new PersonNotFoundException("");
         }
-        for (Person personToDelete : listPersons){
+
+        Iterator<Person> iterator= listPersons.iterator();
+        while (iterator.hasNext()){
+            Person personToDelete = iterator.next();
             if (personToDelete.getFirstName().equals(firstName) && personToDelete.getLastName().equals(lastName)){
-                listPersons.remove(personToDelete);
+                iterator.remove();
                 logger.info("Person deleted successfully !");
                 break;
             }
@@ -124,4 +144,25 @@ public class PersonRepository {
     }
 
 
+
+    public Set<Person> personWithFullInformation(){
+
+        Set<Person> personWithFullInformations = listPersons;
+
+        personWithFullInformations.forEach(p->{
+            FireStationRepository.listFireStations.forEach(f->{
+                if (f.getAddress().equals(p.getAdress()))
+                    p.addFireStation(f);
+            });
+        });
+
+        personWithFullInformations.forEach(p->{
+            MedicalRecordRepository.listMedicalRecords.forEach(m->{
+                if (p.getFirstName().equals(m.getFirstName()) && p.getLastName().equals(m.getLastName()))
+                    p.addMedicalRecords(m);
+            });
+        });
+
+        return personWithFullInformations;
+    }
 }

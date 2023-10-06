@@ -2,6 +2,7 @@ package net.safety.repository;
 
 import com.jsoniter.any.Any;
 import net.safety.dataLoad.DataLoadInit;
+import net.safety.dto.FireStationPersonsDto;
 import net.safety.exception.AddressNotFoundException;
 import net.safety.exception.DataLoadErrorException;
 import net.safety.exception.FireStationIsAlreadyExistException;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @Repository
 public class FireStationRepository{
 
-    public static Set<FireStation> listFireStations = new HashSet<FireStation>();
+    public static Set<FireStation> listFireStations = new HashSet<>();
     private final DataLoadInit dataLoadInit;
     private final Logger logger = LoggerFactory.getLogger(FireStationRepository.class);
 
@@ -49,23 +50,14 @@ public class FireStationRepository{
         logger.info("Fire station data reading Completed successfully");
     }
 
-    /*public Set<FireStation> getAllFireStations() {
-        Set<FireStation> allFireStationSet = new HashSet<>();
-        Set<String> addresses = new HashSet<>();
-        AtomicInteger stationNumber = new AtomicInteger();
-
-        liste.forEach(f-> {
-                liste.forEach(a-> {
-                        if (f.getStationNumber() == a.getStationNumber())
-                        {
-                           allFireStationSet.add(f);
-                        }
-                });
-           }
-           );
-        liste = allFireStationSet;
-        return liste;
-    }*/
+    public Set<FireStation> getAllFireStations(){
+        try{
+            return listFireStations;
+        }catch (DataLoadErrorException e){
+            logger.error("Error when reading fire stations data from file !");
+            throw new DataLoadErrorException("Error when reading fire stations data from file !");
+        }
+    }
 
     public List<FireStation> getFireStationByNumber(int number){
         logger.info("getFireStationByNumber started..");
@@ -123,57 +115,49 @@ public class FireStationRepository{
 
     public FireStation addForeStation(FireStation from) {
         logger.info("addFireStation started..");
-        String result = fireStationExist(from);
-        if (result.equals("exist")){
+        boolean result = isFireStationExist(from);
+        if (result){
             logger.error("Same FireStation exists, creation failed.");
             throw new FireStationIsAlreadyExistException("Same Firestation exists");
         }
-        else if(result.equals("number different address exist")){ // hic girmicek buraya sil ileride duzenlerken
-            listFireStations.add(from);
-            logger.info("The address is already supported by a firestation, a new firestation of address / number is created successfully.");
-            return from;
-        }
-        else{
-            listFireStations.add(from);
-            logger.info("The Firestation is created successfully.");
-            return from;
-        }
+
+        listFireStations.add(from);
+        logger.info("The Firestation is created successfully.");
+        return from;
+
     }
 
     public FireStation updateFireStation(FireStation from){
         logger.info("updateFireStation is started..");
         boolean result = isAdressFireStationExist(from);
+        Iterator<FireStation> iterator= listFireStations.iterator();
 
         if(!result) {
             logger.error("FireStation with specified address doesnt exist! update is failed.");
             throw new AddressNotFoundException("FireStation with specified address doesnt exist! update is failed.");
         }
 
-        listFireStations.forEach(f->{
-               if (f.getAddress().equals(from.getAddress())){
-                   f.setStationNumber(from.getStationNumber());
-                   System.out.println("DENEME SERISI BIR = " + f.getStationNumber() + "   uuu " + from.getStationNumber() + "   VE   " + f.toString());
-               }
-
-            });
-            logger.info("FireStation updated successfully.");
-            return from;
+        while (iterator.hasNext()) {
+            FireStation f = iterator.next();
+            if (f.getAddress().equals(from.getAddress())) {
+                f.setStationNumber(from.getStationNumber());
+                logger.info("FireStation is successfully updated ");
+                break;
+            }
+        }
+        return from;
 
     }
 
     public void deleteFireStationForAnAddress(String address, int number) {
         logger.info("deleteFireStationForAnAddress is started..");
+        Iterator<FireStation> iterator = listFireStations.iterator();
         boolean result = false;
 
-//        boolean deneme = listFireStations.removeIf(f -> f.getAddress().compareTo(address) == 0 && f.getStationNumber() == number);
-//        if (deneme == true){
-//            logger.info("DELETED SUCCESSFULLY ");
-//        }else
-//            logger.error("NOT DELETED ");
-
-       for (FireStation f : listFireStations) {
-            if (f.getAddress().equals(address)  && f.getStationNumber() == number) {
-                listFireStations.remove(f);
+        while (iterator.hasNext()) {
+            FireStation f = iterator.next();
+            if (f.getAddress().equals(address) && f.getStationNumber() == number) {
+                iterator.remove();
                 logger.info("FireStation is successfully deleted ");
                 result = true;
                 break;
@@ -184,26 +168,18 @@ public class FireStationRepository{
             throw new FireStationNotFoundException();
         }
     }
+/*
+    public Set<FireStationPersonsDto> fireStationWithPersonList(){
+        Set<FireStationPersonsDto> fireStationsWithPersonList = listFireStations;
+        fireStationsWithPersonList.forEach(f->{
+            PersonRepository.listPersons.forEach(p->{
+                if (p.getAdress().equals(f.getAddress()) && !fireStationsWithPersonList.contains(p))
+                    f.addPerson(p);
+            });
+        });
 
-
-    private String fireStationExist(FireStation from) {
-        String result = "";
-        boolean addressExist= false;
-        for (FireStation f : listFireStations){
-            if (f.getAddress().equals(from.getAddress()) && f.getStationNumber() == from.getStationNumber()){
-                result = "exist";
-                break;
-            }else if(f.getAddress().equals(from.getAddress())){
-                result = "number different";
-                addressExist = true;
-            }else{
-                result = "dont Exist";
-            }
-        }
-        if (addressExist)
-            result += " address exist";
-        return result;
-    }
+        return fireStationsWithPersonList;
+    }*/
 
 
     private boolean isAdressFireStationExist(FireStation fireStation) {
@@ -216,6 +192,11 @@ public class FireStationRepository{
             }
         }
 
+        return result;
+    }
+
+    private boolean isFireStationExist(FireStation fireStation){
+        boolean result = listFireStations.contains(fireStation);
         return result;
     }
 

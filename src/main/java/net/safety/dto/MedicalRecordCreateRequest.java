@@ -1,10 +1,10 @@
-package net.safety.model;
+package net.safety.dto;
 
-import com.jsoniter.any.Any;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
-import java.util.*;
-
-public class MedicalRecord {
+public class MedicalRecordCreateRequest {
 
     private String firstName;
     private String lastName;
@@ -13,10 +13,10 @@ public class MedicalRecord {
     private List<String> medications;
     private Set<String> allergies;
 
-    public MedicalRecord() {
+    public MedicalRecordCreateRequest() {
     }
 
-    public MedicalRecord(String firstName, String lastName, Date birthdate, List<String> medications, Set<String> allergies) {
+    public MedicalRecordCreateRequest(String firstName, String lastName, Date birthdate, List<String> medications, Set<String> allergies) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthdate;
@@ -62,29 +62,5 @@ public class MedicalRecord {
 
     public void setAllergies(Set<String> allergies) {
         this.allergies = allergies;
-    }
-
-    @Override
-    public String toString() {
-        return "MedicalRecord{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", birthDate=" + birthDate +
-                ", medications=" + medications +
-                ", allergies=" + allergies +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MedicalRecord)) return false;
-        MedicalRecord that = (MedicalRecord) o;
-        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(birthDate, that.birthDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(firstName, lastName, birthDate);
     }
 }

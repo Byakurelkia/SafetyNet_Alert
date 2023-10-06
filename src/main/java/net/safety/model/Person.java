@@ -1,8 +1,6 @@
 package net.safety.model;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class Person {
 
@@ -13,6 +11,18 @@ public class Person {
     private String mail;
     private String phoneNumber;
     private String zipCode;
+
+    public void setMedicalRecords(Set<MedicalRecord> medicalRecords) {
+        this.medicalRecords = medicalRecords;
+    }
+
+    public List<FireStation> getFireStation() {
+        return fireStation;
+    }
+
+    public void addFireStation(FireStation fireStation) {
+        this.fireStation.add(fireStation);
+    }
 
     public Person() {
     }
@@ -29,7 +39,7 @@ public class Person {
 
 
     private Set<MedicalRecord> medicalRecords = new HashSet<>();
-    private FireStation fireStation;
+    private List<FireStation> fireStation = new ArrayList<>();
 
 
 
@@ -85,17 +95,11 @@ public class Person {
         return medicalRecords;
     }
 
-    public void setMedicalRecords(MedicalRecord medicalRecords) {
+    public void addMedicalRecords(MedicalRecord medicalRecords) {
         this.medicalRecords.add(medicalRecords);
     }
 
-    public FireStation getFireStation() {
-        return fireStation;
-    }
 
-    public void setFireStation(FireStation fireStation) {
-        this.fireStation = fireStation;
-    }
 
     public void deleteFireStation(){
         this.fireStation = null;

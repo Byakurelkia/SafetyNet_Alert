@@ -15,6 +15,7 @@ public class FireStationNotFoundException extends RuntimeException{
         super(message);
     }
 
+
     public FireStationNotFoundException() {
 
     }

@@ -12,9 +12,6 @@ public class FireStation {
     private String address ;
     private int stationNumber;
 
-    private Set<Person> personList;
-
-
     public FireStation() {
     }
 
@@ -39,13 +36,6 @@ public class FireStation {
         this.stationNumber = stationNumber;
     }
 
-    public Set<Person> getPersonList() {
-        return personList;
-    }
-
-    public void setPersonList(Set<Person> personList) {
-        this.personList = personList;
-    }
 
     /*@Override
     public String toString() {
@@ -58,7 +48,7 @@ public class FireStation {
         if (this == o) return true;
         if (!(o instanceof FireStation)) return false;
         FireStation that = (FireStation) o;
-        return stationNumber == that.stationNumber && Objects.equals(address, that.address) && Objects.equals(personList, that.personList);
+        return stationNumber == that.stationNumber && Objects.equals(address, that.address);
     }
 
     @Override
