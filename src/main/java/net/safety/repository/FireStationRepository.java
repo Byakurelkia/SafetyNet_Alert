@@ -42,7 +42,7 @@ public class FireStationRepository{
                         );
                     }
             );
-        }catch (DataLoadErrorException | IOException e){
+        }catch (DataLoadErrorException e){
             logger.error("Error when reading data from file..");
             e.getMessage();
             throw new DataLoadErrorException("Error when reading data from file..");
@@ -165,7 +165,7 @@ public class FireStationRepository{
         }
         if (!result){
             logger.error("This address and number specified doesnt correspond to a firestation, delete failed.");
-            throw new FireStationNotFoundException();
+            throw new FireStationNotFoundException("This address and number specified doesn't correspond to a fire station");
         }
     }
 /*

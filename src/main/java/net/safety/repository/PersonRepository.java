@@ -3,12 +3,9 @@ package net.safety.repository;
 
 import com.jsoniter.any.Any;
 import net.safety.dataLoad.DataLoadInit;
-import net.safety.dto.*;
 import net.safety.exception.DataLoadErrorException;
 import net.safety.exception.PersonAlreadyExistException;
 import net.safety.exception.PersonNotFoundException;
-import net.safety.model.FireStation;
-import net.safety.model.MedicalRecord;
 import net.safety.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +16,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Repository
 public class PersonRepository {
 
     public static Set<Person> listPersons = new HashSet<>();
-    public static Set<Person> listPersonsWithAllInformations = new HashSet<>();
     private final DataLoadInit dataLoadInit;
     private final Logger logger = LoggerFactory.getLogger(PersonRepository.class);
 
@@ -46,13 +44,13 @@ public class PersonRepository {
                                 p.get("lastName").toString(),
                                 p.get("address").toString(),
                                 p.get("city").toString(),
-                                p.get("zip").toString(),
+                                p.get("email").toString(),
                                 p.get("phone").toString(),
-                                p.get("email").toString()
+                                p.get("zip").toString()
                         )
                 );
             });
-        }catch (DataLoadErrorException | IOException e){
+        }catch (DataLoadErrorException e){
             logger.error("Error when reading data from file..");
             e.getMessage();
             throw new DataLoadErrorException("Error when reading data from file ..");
@@ -81,6 +79,33 @@ public class PersonRepository {
         return person;
     }
 
+    public List<Person> getPersonsListByLastName(String lastName){
+        logger.info("getPersonsListByLastName started..");
+        AtomicBoolean isExist = new AtomicBoolean(false);
+        listPersons.forEach(person->{
+           if (person.getLastName().equals(lastName))
+               isExist.set(true);
+        });
+
+        if (!isExist.get()){
+            logger.error("Person doesn't exist with this lastName.");
+            throw new PersonNotFoundException("Person doesn't exist with this lastName.");
+        }
+        logger.info("Persons list with lastName searching is complete successfully");
+        return listPersons.stream().filter(person -> person.getLastName().equals(lastName)).collect(Collectors.toList());
+
+    }
+
+    public List<Person> getPersonsByAddress(String address){
+        List<Person> personList = listPersons.stream().filter(f-> f.getAddress().equals(address)).collect(Collectors.toList());
+
+        if (personList.isEmpty()){
+            logger.error("Persons doesnt exist with this address");
+            throw new PersonNotFoundException("Nobody exist in this address specified! ");
+        }
+        return personList;
+    }
+
     public Person createPerson(Person from) {
 
     if (getPerson(from.getFirstName(),from.getLastName()) == null){
@@ -93,7 +118,7 @@ public class PersonRepository {
     }
     }
 
-    public Person updatePerson(String firstName, String lastName, PersonUpdateRequest personUpdateRequest){
+    public Person updatePerson(String firstName, String lastName, Person person){
         if (getPerson(firstName,lastName) == null){
             logger.error("Update person failed ! ");
             throw new PersonNotFoundException("Person with first and last name : '"+ firstName
@@ -104,11 +129,11 @@ public class PersonRepository {
         while (iterator.hasNext()) {
             Person personToUpdate = iterator.next();
             if (personToUpdate.getFirstName().equals(firstName) && personToUpdate.getLastName().equals(lastName)) {
-                personToUpdate.setAdress(personUpdateRequest.getAdress());
-                personToUpdate.setCity(personUpdateRequest.getCity());
-                personToUpdate.setZipCode(personUpdateRequest.getZipCode());
-                personToUpdate.setMail(personUpdateRequest.getMail());
-                personToUpdate.setPhoneNumber(personUpdateRequest.getPhoneNumber());
+                personToUpdate.setAddress(person.getAddress());
+                personToUpdate.setCity(person.getCity());
+                personToUpdate.setZipCode(person.getZipCode());
+                personToUpdate.setMail(person.getMail());
+                personToUpdate.setPhoneNumber(person.getPhoneNumber());
                 logger.info("Person updated successfully ! ");
                 break;
             }
@@ -143,15 +168,13 @@ public class PersonRepository {
         return getPerson;
     }
 
-
-
     public Set<Person> personWithFullInformation(){
 
         Set<Person> personWithFullInformations = listPersons;
 
         personWithFullInformations.forEach(p->{
             FireStationRepository.listFireStations.forEach(f->{
-                if (f.getAddress().equals(p.getAdress()))
+                if (f.getAddress().equals(p.getAddress()))
                     p.addFireStation(f);
             });
         });
@@ -165,4 +188,5 @@ public class PersonRepository {
 
         return personWithFullInformations;
     }
+
 }

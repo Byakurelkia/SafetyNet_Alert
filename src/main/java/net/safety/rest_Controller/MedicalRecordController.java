@@ -3,9 +3,8 @@ package net.safety.rest_Controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import net.safety.dto.MedicalRecordCreateRequest;
 import net.safety.dto.MedicalRecordDto;
-import net.safety.dto.MedicalRecordUpdateRequest;
+import net.safety.model.MedicalRecord;
 import net.safety.service.MedicalRecordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/medicalrecords")
@@ -31,42 +31,36 @@ public class MedicalRecordController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Medical records loaded successfully"),
                     @ApiResponse(responseCode = "500", description = "Error when loading data file")})
     @GetMapping
-    public ResponseEntity<List<MedicalRecordDto>> getAllMedRec(){
+    public ResponseEntity<List<MedicalRecord>> getAllMedRec(){
         return ResponseEntity.ok(medicalRecordService.getAllMedicalRecords());
     }
-
 
     @Operation(summary = "Request to get a medical record for person specified")
     @ApiResponses(value = {@ApiResponse(responseCode = "200",description = "Medical record loaded successfully"),
                     @ApiResponse(responseCode = "404",description = "Medical record doesnt exist for this person")})
     @GetMapping("/{firstName}/{lastName}")
-    public List<MedicalRecordDto> getMedicalRecordsByNameAndLastName(@PathVariable(value = "firstName") String firstName,
-                                                                  @PathVariable(value = "lastName") String lastName){
+    public Set<MedicalRecord> getMedicalRecordsByNameAndLastName(@PathVariable(value = "firstName") String firstName,
+                                                                 @PathVariable(value = "lastName") String lastName){
             return medicalRecordService.getMedicalRecordByNameAndLastName(firstName,lastName);
     }
-
 
     @Operation(summary = "Request to create a new medical record - Enter the date of birth as follows : year-month-day")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Medical record record created successfully"),
                     @ApiResponse(responseCode = "400", description = "A medical record already exist for this person")})
     @PostMapping
-    public ResponseEntity<MedicalRecordDto> createMedicalRecord(@RequestBody MedicalRecordCreateRequest from){
+    public ResponseEntity<MedicalRecord> createMedicalRecord(@RequestBody MedicalRecord from){
         return ResponseEntity.status(HttpStatus.CREATED).body(medicalRecordService.createMedicalRecord(from));
     }
-
-
 
     @Operation(summary = "Request to update a medical record ")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Medical record updated successfully"),
                     @ApiResponse(responseCode = "404", description = "Medical record doesnt exist for person specified")})
     @PutMapping("/{firstName}/{lastName}")
-    public ResponseEntity<MedicalRecordDto> updateMedicalRecord(@PathVariable(value = "firstName") String firstName,
+    public ResponseEntity<MedicalRecord> updateMedicalRecord(@PathVariable(value = "firstName") String firstName,
                                                                 @PathVariable(value = "lastName") String lastName,
-                                                                @RequestBody MedicalRecordUpdateRequest from){
+                                                                @RequestBody MedicalRecordDto from){
         return ResponseEntity.ok(medicalRecordService.updateMedicalRecord(firstName, lastName, from));
     }
-
-
 
     @Operation(summary = "Request to delete a medical record")
     @ApiResponses(value = {@ApiResponse(responseCode = "204",description = "Medical record deleted successfully"),

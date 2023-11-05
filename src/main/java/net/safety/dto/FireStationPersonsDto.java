@@ -2,16 +2,14 @@ package net.safety.dto;
 
 import net.safety.model.Person;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class FireStationPersonsDto {
 
     private String address;
     private int stationNumber;
 
-    private Set<Person> personList = new HashSet<>();
+    private List<Person> personList = new ArrayList<>();
 
     public String getAddress() {
         return address;
@@ -29,18 +27,18 @@ public class FireStationPersonsDto {
         this.stationNumber = stationNumber;
     }
 
-    public Set<Person> getPersonList() {
+    public List<Person> getPersonList() {
         return personList;
     }
 
-    public void setPersonList(Set<Person> personList) {
+    public void setPersonList(List<Person> personList) {
         this.personList = personList;
     }
 
     public FireStationPersonsDto() {
 
     }
-    public FireStationPersonsDto(String address, int stationNumber, Set<Person> personList) {
+    public FireStationPersonsDto(String address, int stationNumber, List<Person> personList) {
         this.address = address;
         this.stationNumber = stationNumber;
         this.personList = personList;

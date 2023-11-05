@@ -1,9 +1,12 @@
 package net.safety.service;
 
 import net.safety.dto.*;
+import net.safety.exception.AddressNotFoundException;
 import net.safety.exception.DataLoadErrorException;
 import net.safety.exception.PersonAlreadyExistException;
 import net.safety.exception.PersonNotFoundException;
+import net.safety.mapper.PersonMapper;
+import net.safety.model.MedicalRecord;
 import net.safety.model.Person;
 import net.safety.repository.PersonRepository;
 import org.slf4j.Logger;
@@ -17,53 +20,58 @@ import java.util.stream.Collectors;
 public class PersonService {
 
     private final PersonRepository personRepository;
-    private final PersonDtoConverter personDtoConverter;
     private final FireStationService fireStationService;
     private final MedicalRecordService medicalRecordService;
     private final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
 
-    public PersonService(PersonRepository personRepository, PersonDtoConverter personDtoConverter, FireStationService fireStationService, MedicalRecordService medicalRecordService) {
+    public PersonService(PersonRepository personRepository, FireStationService fireStationService, MedicalRecordService medicalRecordService) {
         this.personRepository = personRepository;
-        this.personDtoConverter = personDtoConverter;
         this.fireStationService = fireStationService;
         this.medicalRecordService = medicalRecordService;
     }
 
-    public Set<PersonDto> getAllPersonsDto() {
+    public Set<Person> getAllPersons() {
         logger.info("getAllPersons started.");
         try {
-            return personRepository.getAllPersons().stream()
-                    .map(personDtoConverter::convertToDto).collect(Collectors.toSet());
+            return personRepository.getAllPersons();
         } catch (DataLoadErrorException e){
             logger.error("Error when reading persons data from file !");
             throw new DataLoadErrorException("Error when reading persons data from file !");
         }
     }
 
-    public PersonDto getPersonByLastAndFirstName(String firstName, String lastName) {
+    public Person getPersonByLastAndFirstName(String firstName, String lastName) {
         Person personFind;
         try {
              personFind = personRepository.getPersonByLastAndFirstName(firstName,lastName);
         }catch (PersonNotFoundException e){
             throw new PersonNotFoundException("Person doesn't exist with this first and last name !");
         }
-        return personDtoConverter.convertToDto(personFind);
+        return personFind;
     }
 
-    public PersonDto createPerson(PersonCreateRequest from) {
+    public List<Person> getPersonsByAddress(String address){
+        try{
+            return personRepository.getPersonsByAddress(address);
+        }catch (PersonNotFoundException e){
+            throw new PersonNotFoundException("Nobody exist in this address specified! ");
+        }
+    }
+
+    public Person createPerson(Person from) {
         Person personToCreate;
         try {
-           personToCreate = personRepository.createPerson(personDtoConverter.convertToPerson(from));
+           personToCreate = personRepository.createPerson(from);
         }catch (PersonAlreadyExistException e){
             throw new PersonAlreadyExistException("A person with same name and last name exists already !");
         }
-        return personDtoConverter.convertToDto(personToCreate);
+        return personToCreate;
     }
 
-    public PersonDto updatePerson(String firstName, String lastName, PersonUpdateRequest personUpdateRequest) {
+    public Person updatePerson(String firstName, String lastName, PersonDto personDto) {
         try {
-            return personDtoConverter.convertToDto(personRepository.updatePerson(firstName,lastName,personUpdateRequest));
+            return personRepository.updatePerson(firstName,lastName, PersonMapper.INSTANCE.personDtoToPerson(personDto));
         }catch (PersonNotFoundException e){
             throw new PersonNotFoundException("Person with first and last name : '"+ firstName + " , "
                     + lastName + " doesnt exists !");
@@ -80,24 +88,37 @@ public class PersonService {
     }
 
     /* ALERT SERVICES */
-/*
-    public List<String> getAllPhoneNumbersForAFireStation(int stationNumber){
-        if (fireStationService.getFireStationByNumber(stationNumber).isEmpty()){
-            logger.error("Fire station with this number doesnt exist!");
-        }
 
-        List<FireStationPersonsDto> fireStationList = fireStationService.getFireStationByNumber(stationNumber);
-        List<String> allPhoneNumbers = new ArrayList<>();
+    public List<String> getAllMailsByCity(String city) {
+        logger.info("Alert Service Get All Mails By City Started..");
+        List<String> allMailsByCity = new ArrayList<>();
+        List<Person> allPersonsByCity = personRepository.getAllPersons().stream()
+                .filter(person-> person.getCity().equals(city)).collect(Collectors.toList());
 
+        allPersonsByCity.forEach(person -> allMailsByCity.add(person.getMail()));
+        if (allPersonsByCity.isEmpty())
+            throw new AddressNotFoundException("This city doesnt exist in our database ! ");
 
-
-        return allPhoneNumbers;
-
-    }*/
-
-    public Set<Person> getAllInfoPersons(){
-        return personRepository.personWithFullInformation();
+        return allMailsByCity;
     }
 
+    public List<PersonInfoByLastNameDto> getPersonsInfoByFirstAndLastNameDto(String lastName) {
+        logger.info("Alert Service Get Persons Info By Last Name Dto Started..");
+        return personRepository.getPersonsListByLastName(lastName).stream().map(person->{
+            PersonInfoByLastNameDto personInfoDto = PersonMapper.INSTANCE.personToPersonInfoByLastNameDto(person);
+            Set<MedicalRecord> medRec = medicalRecordService
+                    .getMedicalRecordByNameAndLastName(person.getFirstName(), person.getLastName());
 
+            medRec.forEach(mRecord-> {
+                try {
+                    personInfoDto.setAge(fireStationService.countAge(mRecord.getBirthDate()));
+                    personInfoDto.setMedications(mRecord.getMedications());
+                    personInfoDto.setAllergies(mRecord.getAllergies());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            return personInfoDto;
+        }).collect(Collectors.toList());
+    }
 }

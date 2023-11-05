@@ -2,30 +2,26 @@ package net.safety.dto;
 
 public class PersonDto {
 
-    private String firstName;
-    private String lastName;
-    private String adress;
+    private String address;
     private String city;
     private String mail;
     private String phoneNumber;
     private String zipCode;
 
-    public PersonDto(String firstName, String lastName, String mail, String phoneNumber, String adress, String zipCode, String city) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public PersonDto(String mail, String phoneNumber, String address, String zipCode, String city) {
         this.mail = mail;
         this.phoneNumber =phoneNumber;
-        this.adress = adress;
+        this.address = address;
         this.zipCode = zipCode;
         this.city = city;
     }
 
+    public PersonDto() {}
+
     @Override
     public String toString() {
         return "PersonDto{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", adress='" + adress + '\'' +
+                ", adress='" + address + '\'' +
                 ", city='" + city + '\'' +
                 ", mail='" + mail + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
@@ -33,28 +29,13 @@ public class PersonDto {
                 '}';
     }
 
-    public String getFirstName() {
-        return firstName;
+
+    public String getAddress() {
+        return address;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getAdress() {
-        return adress;
-    }
-
-    public void setAdress(String adress) {
-        this.adress = adress;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getCity() {

@@ -24,6 +24,12 @@ public class MedicalRecord {
         this.allergies = allergies;
     }
 
+    public MedicalRecord(Date birthdate, List<String> medications, Set<String> allergies) {
+        this.birthDate = birthdate;
+        this.medications = medications;
+        this.allergies = allergies;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -66,9 +72,9 @@ public class MedicalRecord {
 
     @Override
     public String toString() {
-        return "MedicalRecord{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
+        return "{" +
+                "firstName=" + firstName +
+                ", lastName=" + lastName +
                 ", birthDate=" + birthDate +
                 ", medications=" + medications +
                 ", allergies=" + allergies +
@@ -80,11 +86,11 @@ public class MedicalRecord {
         if (this == o) return true;
         if (!(o instanceof MedicalRecord)) return false;
         MedicalRecord that = (MedicalRecord) o;
-        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(birthDate, that.birthDate);
+        return Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(birthDate, that.birthDate) && Objects.equals(medications, that.medications) && Objects.equals(allergies, that.allergies);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstName, lastName, birthDate);
+        return Objects.hash(firstName, lastName, birthDate, medications, allergies);
     }
 }

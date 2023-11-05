@@ -6,11 +6,14 @@ public class Person {
 
     private String firstName;
     private String lastName;
-    private String adress;
+    private String address;
     private String city;
     private String mail;
     private String phoneNumber;
     private String zipCode;
+
+    private Set<MedicalRecord> medicalRecords = new HashSet<>();
+    private List<FireStation> fireStation = new ArrayList<>();
 
     public void setMedicalRecords(Set<MedicalRecord> medicalRecords) {
         this.medicalRecords = medicalRecords;
@@ -27,21 +30,24 @@ public class Person {
     public Person() {
     }
 
-    public Person(String firstName, String lastName, String adress, String city, String email, String phone, String zip) {
+    public Person(String firstName, String lastName, String adress, String city, String mail, String phoneNumber, String zip) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.adress = adress;
+        this.address = adress;
         this.city = city;
-        this.mail = email;
-        this.phoneNumber = phone;
-        this.zipCode =zip;
+        this.mail = mail;
+        this.phoneNumber = phoneNumber;
+        this.zipCode = zip;
     }
 
 
-    private Set<MedicalRecord> medicalRecords = new HashSet<>();
-    private List<FireStation> fireStation = new ArrayList<>();
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -51,12 +57,12 @@ public class Person {
         return lastName;
     }
 
-    public String getAdress() {
-        return adress;
+    public String getAddress() {
+        return address;
     }
 
-    public void setAdress(String adress) {
-        this.adress = adress;
+    public void setAddress(String adress) {
+        this.address = adress;
     }
 
     public String getCity() {
@@ -99,18 +105,30 @@ public class Person {
         this.medicalRecords.add(medicalRecords);
     }
 
-
-
     public void deleteFireStation(){
         this.fireStation = null;
     }
 
-    /*@Override
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person)) return false;
+        Person person = (Person) o;
+        return Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(address, person.address) && Objects.equals(city, person.city) && Objects.equals(mail, person.mail) && Objects.equals(phoneNumber, person.phoneNumber) && Objects.equals(zipCode, person.zipCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, address, city, mail, phoneNumber, zipCode);
+    }
+
+    @Override
     public String toString() {
         return "Person{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", adress='" + adress + '\'' +
+                ", address='" + address + '\'' +
                 ", city='" + city + '\'' +
                 ", mail='" + mail + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
@@ -118,18 +136,5 @@ public class Person {
                 ", medicalRecords=" + medicalRecords +
                 ", fireStation=" + fireStation +
                 '}';
-    }*/
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Person)) return false;
-        Person person = (Person) o;
-        return Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(adress, person.adress) && Objects.equals(city, person.city) && Objects.equals(mail, person.mail) && Objects.equals(phoneNumber, person.phoneNumber) && Objects.equals(zipCode, person.zipCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(firstName, lastName, adress, city, mail, phoneNumber, zipCode);
     }
 }

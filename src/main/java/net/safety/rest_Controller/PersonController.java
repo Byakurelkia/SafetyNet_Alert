@@ -3,9 +3,8 @@ package net.safety.rest_Controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import net.safety.dto.PersonCreateRequest;
 import net.safety.dto.PersonDto;
-import net.safety.dto.PersonUpdateRequest;
+import net.safety.dto.PersonInfoByLastNameDto;
 import net.safety.model.Person;
 import net.safety.service.PersonService;
 import org.springframework.http.HttpStatus;
@@ -29,8 +28,8 @@ public class PersonController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Persons are loaded successfully"),
             @ApiResponse(responseCode = "500", description = "Error when loading data from file")})
     @GetMapping("/persons")
-    public ResponseEntity<Set<PersonDto>> allPersons(){
-        return ResponseEntity.ok(personService.getAllPersonsDto());
+    public ResponseEntity<Set<Person>> allPersons(){
+        return ResponseEntity.ok(personService.getAllPersons());
     }
 
     //OK
@@ -38,7 +37,7 @@ public class PersonController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Person is loaded successfully"),
             @ApiResponse(responseCode = "404", description = "Person doesn't exist with this name and lastname")})
     @GetMapping("/persons/find/{firstName}/{lastName}")
-    public ResponseEntity<PersonDto> getPersonByLastAndFirstName(@PathVariable(name = "firstName") String firstName,
+    public ResponseEntity<Person> getPersonByLastAndFirstName(@PathVariable(name = "firstName") String firstName,
                                                  @PathVariable(name = "lastName") String lastName){
         return ResponseEntity.ok(personService.getPersonByLastAndFirstName(firstName,lastName));
     }
@@ -48,7 +47,7 @@ public class PersonController {
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Person is created successfully"),
             @ApiResponse(responseCode ="400", description = "A person is already exists with this name and lastname")})
     @PostMapping("/persons")
-    public ResponseEntity<PersonDto> createPerson(@RequestBody PersonCreateRequest from){
+    public ResponseEntity<Person> createPerson(@RequestBody Person from){
         return ResponseEntity.status(HttpStatus.CREATED).body(personService.createPerson(from));
     }
 
@@ -57,10 +56,10 @@ public class PersonController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Person is updated successfully"),
             @ApiResponse(responseCode = "404", description = "A person doesn't exist with this name and lastname")})
     @PutMapping("/persons/{firstName}/{lastName}")
-    public ResponseEntity<PersonDto> updatePerson(@PathVariable(name = "firstName") String firstName,
+    public ResponseEntity<Person> updatePerson(@PathVariable(name = "firstName") String firstName,
                                   @PathVariable(name = "lastName") String lastName,
-                                  @RequestBody PersonUpdateRequest personUpdateRequest){
-        return ResponseEntity.ok(personService.updatePerson(firstName, lastName, personUpdateRequest));
+                                  @RequestBody PersonDto person){
+        return ResponseEntity.ok(personService.updatePerson(firstName, lastName, person));
     }
 
     //OK
@@ -75,20 +74,31 @@ public class PersonController {
     }
 
 
-/*
-    @Operation(summary = "Request to get all phone numbers for a station number")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Numbers get successfully"),
-                    @ApiResponse(responseCode = "404",description = "Firestation not found with this number")})
-    @GetMapping("/phoneAlert/firestation={stationNumber}")
-        public ResponseEntity<List<String>> getAllPhoneNumbers(@PathVariable(name = "stationNumber") int stationNumber){
-        return ResponseEntity.ok(personService.getAllPhoneNumbersForAFireStation(stationNumber));
+    @GetMapping("/personsByAddress/{address}")
+    public List<Person> getPersonsByAddress(@PathVariable(value = "address") String address){
+        return personService.getPersonsByAddress(address);
     }
-*/
 
-  /*  @GetMapping("/deneme")
-    public ResponseEntity<Set<Person>> getPersonsWithAllInformations(){
-        return ResponseEntity.ok(personService.getAllInfoPersons());
-    }*/
+
+    /*ALERT RESPONSE URL PART*/
+
+    //OK
+    @Operation(summary = "Request to get all mails for a city")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Mails loaded successfully"),
+            @ApiResponse(responseCode = "404", description = "This city doesn't exist in our database! ")})
+    @GetMapping("/communityEmail/{city}")
+    public ResponseEntity<List<String>> getAllMailsByCity(@PathVariable(value = "city") String city){
+        return ResponseEntity.ok(personService.getAllMailsByCity(city));
+    }
+
+    @Operation(summary = "Request to get specified info for lastname specified")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Persons Info loaded successfully"),
+            @ApiResponse(responseCode = "404", description = "This person with lastName specified doesn't exist in our database! ")})
+    @GetMapping("/personInfo/{firstName}/{lastName}")
+    public ResponseEntity<List<PersonInfoByLastNameDto>> getPersonsInfoByFirstAndLastNameDto(
+            @PathVariable(value = "lastName") String lastName){
+        return ResponseEntity.ok(personService.getPersonsInfoByFirstAndLastNameDto(lastName));
+    }
 
 
 }

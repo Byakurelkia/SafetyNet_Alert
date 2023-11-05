@@ -2,9 +2,6 @@ package net.safety.repository;
 
 import com.jsoniter.any.Any;
 import net.safety.dataLoad.DataLoadInit;
-import net.safety.dto.MedicalRecordDto;
-import net.safety.dto.MedicalRecordDtoConverter;
-import net.safety.dto.MedicalRecordUpdateRequest;
 import net.safety.exception.DataLoadErrorException;
 import net.safety.exception.MedicalRecordAlreadyExistException;
 import net.safety.exception.MedicalRecordNotFoundException;
@@ -23,13 +20,11 @@ import java.util.stream.Collectors;
 @Repository
 public class MedicalRecordRepository {
 
-    private final MedicalRecordDtoConverter medicalRecordDtoConverter;
     private final DataLoadInit dataLoadInit;
     public static List<MedicalRecord> listMedicalRecords = new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger(MedicalRecordRepository.class);
 
-    public MedicalRecordRepository(MedicalRecordDtoConverter medicalRecordDtoConverter, DataLoadInit dataLoadInit){
-        this.medicalRecordDtoConverter = medicalRecordDtoConverter;
+    public MedicalRecordRepository(DataLoadInit dataLoadInit){
         this.dataLoadInit = dataLoadInit;
         getAllMedicalRecordsFromFile();
     }
@@ -62,7 +57,7 @@ public class MedicalRecordRepository {
                         }
             }
             );
-        }catch (DataLoadErrorException | IOException e){
+        }catch (DataLoadErrorException e){
             logger.error("Error when reading data from file..");
             throw new DataLoadErrorException("Error when reading data from file ..");
         }
@@ -78,7 +73,7 @@ public class MedicalRecordRepository {
         }
     }
 
-    public List<MedicalRecord> getMedicalRecordByNameAndLastName(String firstName, String lastName){
+    public Set<MedicalRecord> getMedicalRecordByNameAndLastName(String firstName, String lastName){
         if (!isMedicalRecordExist(firstName,lastName)){
             logger.error("Medical record doesnt exist for person indicated");
             throw new MedicalRecordNotFoundException("This person doesnt have a medical record saved!");
@@ -87,7 +82,7 @@ public class MedicalRecordRepository {
         logger.info("Medical record loaded successfully");
         return listMedicalRecords.stream()
                 .filter(f-> f.getFirstName().equals(firstName) && f.getLastName().equals(lastName))
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     public MedicalRecord createMedicalRecord(MedicalRecord from){
@@ -101,7 +96,7 @@ public class MedicalRecordRepository {
         return from;
     }
 
-    public MedicalRecord updateMedicalRecord(String firstName, String lastName, MedicalRecordUpdateRequest from) {
+    public MedicalRecord updateMedicalRecord(String firstName, String lastName, MedicalRecord from) {
         if (!isMedicalRecordExist(firstName,lastName)){
             logger.error("Medical record doesnt exist with this first and last name");
             throw new MedicalRecordNotFoundException("Medical record doesnt exist with this first and last name");
@@ -118,7 +113,7 @@ public class MedicalRecordRepository {
                 break;
             }
         }
-        return medicalRecordDtoConverter.convertToMedicalRecord(firstName,lastName,from);
+        return from;
     }
 
     public void deleteMedicalRecord(String firstName, String lastName){
