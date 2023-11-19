@@ -90,29 +90,6 @@ public class FireStationRepository{
         return  Optional.ofNullable(station);
     }
 
-    public Optional<FireStation> getFireStationByAddressAndNumber(FireStation from){
-        logger.info("getFireStationByAddressAndNumber started..");
-
-        FireStation fireStation = new FireStation();
-        for (FireStation f : listFireStations){
-            if (f.getStationNumber() == from.getStationNumber() && f.getAddress().equals(from.getAddress()))
-            {
-                fireStation = f;
-                break;
-            }
-            else
-                fireStation = null;
-        }
-
-        if (fireStation == null){
-            logger.error("FireStation with couple address : '" + from.getAddress() + "' and number : '" + from.getStationNumber() + "' doesn't exist!");
-            throw new FireStationNotFoundException("FireStation with couple address : '" + from.getAddress() + "' and number : '" + from.getStationNumber() + "' doesn't exist!");
-        }
-
-        logger.info("getFireStationByAddressAndNumber realised successfully.");
-        return Optional.ofNullable(fireStation);
-    }
-
     public FireStation addForeStation(FireStation from) {
         logger.info("addFireStation started..");
         boolean result = isFireStationExist(from);

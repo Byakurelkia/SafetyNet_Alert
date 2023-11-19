@@ -1,4 +1,4 @@
-package net.safety.rest_Controller;
+package net.safety.integration_Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.safety.dto.MedicalRecordDto;

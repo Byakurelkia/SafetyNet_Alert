@@ -13,8 +13,6 @@ public interface PersonMapper {
 
     PersonMapper INSTANCE = Mappers.getMapper(PersonMapper.class);
 
-    PersonDto personToPersonDto(Person person);
-
     Person personDtoToPerson(PersonDto personDto);
 
     PersonInfoDto personToPersonInfoDto(Person person);

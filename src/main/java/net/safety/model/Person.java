@@ -12,20 +12,6 @@ public class Person {
     private String phoneNumber;
     private String zipCode;
 
-    private Set<MedicalRecord> medicalRecords = new HashSet<>();
-    private List<FireStation> fireStation = new ArrayList<>();
-
-    public void setMedicalRecords(Set<MedicalRecord> medicalRecords) {
-        this.medicalRecords = medicalRecords;
-    }
-
-    public List<FireStation> getFireStation() {
-        return fireStation;
-    }
-
-    public void addFireStation(FireStation fireStation) {
-        this.fireStation.add(fireStation);
-    }
 
     public Person() {
     }
@@ -97,17 +83,7 @@ public class Person {
         this.zipCode = zipCode;
     }
 
-    public Set<MedicalRecord> getMedicalRecords() {
-        return medicalRecords;
-    }
 
-    public void addMedicalRecords(MedicalRecord medicalRecords) {
-        this.medicalRecords.add(medicalRecords);
-    }
-
-    public void deleteFireStation(){
-        this.fireStation = null;
-    }
 
 
     @Override
@@ -133,8 +109,6 @@ public class Person {
                 ", mail='" + mail + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", zipCode='" + zipCode + '\'' +
-                ", medicalRecords=" + medicalRecords +
-                ", fireStation=" + fireStation +
                 '}';
     }
 }

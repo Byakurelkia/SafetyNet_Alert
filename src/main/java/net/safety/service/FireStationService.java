@@ -6,7 +6,6 @@ import net.safety.exception.AddressNotFoundException;
 import net.safety.exception.DataLoadErrorException;
 import net.safety.exception.FireStationIsAlreadyExistException;
 import net.safety.exception.FireStationNotFoundException;
-import net.safety.mapper.FireStationMapper;
 import net.safety.mapper.PersonInfoByStationNumberMapper;
 import net.safety.mapper.PersonMapper;
 import net.safety.model.FireStation;
@@ -19,7 +18,6 @@ import net.safety.response.PersonInfoByStationNumberResponse;
 import net.safety.response.PersonsByAddressResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -188,12 +186,16 @@ public class FireStationService {
         //création de la liste family
         personsList.forEach(p-> familyList.add(PersonMapper.INSTANCE.personToPersonInfoDto(p)));
 
-        return new ChildAndFamilyByAddressResponse(childDtoList,familyList);
+        //retourne une liste vide si pas d'enfant à l'adresse mentionnée
+        if (childDtoList.isEmpty())
+            return new ChildAndFamilyByAddressResponse();
+        else //retourne une liste rempli si un enfant est présent à l'adresse mentionnée
+            return new ChildAndFamilyByAddressResponse(childDtoList,familyList);
     }
 
-    public List<String> getAllPhoneNumbersByStationNumber(int stationNumber) {
+    public Set<String> getAllPhoneNumbersByStationNumber(int stationNumber) {
         logger.info("Alert Service Get All Phone Numbers By Station Number Started");
-        List<String> allPhoneNumbers = new ArrayList<>();
+        Set<String> allPhoneNumbers = new HashSet<>();
         List<FireStation> fireStation = fireStationRepository.getFireStationByNumber(stationNumber);
 
             //ajout des numéros de téléphones pris en charge par la station sur la liste
@@ -209,6 +211,7 @@ public class FireStationService {
         logger.info("Alert Service Get Persons Info By Address Started");
         List<Person> allPersonsByAddress = personService.getPersonsByAddress(address);
         List<Integer> stationNumbersForAddress = new ArrayList<>();
+
         List<FireStation> allStationsByAddress = fireStationRepository.getFireStationByAddress(address).get();
 
         //ajout des numéros de stations à la liste int
@@ -239,8 +242,8 @@ public class FireStationService {
 
     public List<PersonsInfoByStationNumberListResponse> getPersonsInfoByStationNumberList(List<Integer> listNumbers) {
         logger.info("Alert Service Get Persons Info List By Station Number");
-        //Utilisation de set pour prévenir les doublons d'addresses qui sont pris en charge par plusieurs stations
-        Set<String> addressList = new HashSet<>();
+
+        List<String> addressList = new ArrayList<>();
         List<PersonsInfoByStationNumberListResponse> personsInfoByStationNumberListResponseList = new ArrayList<>();
 
         //Récupération des addresses prise en charge par les stations donnés en paramétre
@@ -318,6 +321,8 @@ public class FireStationService {
             else if (now.getDate() >= birth.getDate())
                 isAdult = true;
         }
+        logger.debug("Control adult or child terminated, is adult? = " + isAdult);
+
         return isAdult;
     }
 

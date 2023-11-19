@@ -1,13 +1,12 @@
-package net.safety.dataLoad;
+package net.safety.service;
 
 import com.jsoniter.any.Any;
+import net.safety.dataLoad.DataLoadInit;
 import net.safety.exception.DataLoadErrorException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +20,7 @@ class DataLoadInitTest {
     }
 
     @Test
-    public void data_load_should_return_any_object() throws IOException {
+    public void data_load_should_return_any_object()  {
         Any result = dataLoadInit.readerFileJSON();
 
         assertNotNull(result);

@@ -74,10 +74,10 @@ public class PersonController {
     }
 
 
-    @GetMapping("/personsByAddress/{address}")
+    /*@GetMapping("/personsByAddress/{address}")
     public List<Person> getPersonsByAddress(@PathVariable(value = "address") String address){
         return personService.getPersonsByAddress(address);
-    }
+    }*/
 
 
     /*ALERT RESPONSE URL PART*/

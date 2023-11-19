@@ -33,7 +33,7 @@ public class MedicalRecordRepository {
     private void getAllMedicalRecordsFromFile() {
         try {
             Any allMedicalRecordsFromJSON = dataLoadInit.readerFileJSON().get("medicalrecords");
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 
             allMedicalRecordsFromJSON.forEach(any ->{
 

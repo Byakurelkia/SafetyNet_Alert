@@ -3,6 +3,7 @@ package net.safety.response;
 import net.safety.dto.PersonsInfoByAddressOrStationNumberDto;
 
 import java.util.List;
+import java.util.Objects;
 
 public class PersonsInfoByStationNumberListResponse {
 
@@ -31,5 +32,26 @@ public class PersonsInfoByStationNumberListResponse {
 
     public void setPersonsInfoByAddressOrStationNumberDtoList(List<PersonsInfoByAddressOrStationNumberDto> personsInfoByAddressOrStationNumberDtoList) {
         this.personsInfoByAddressOrStationNumberDtoList = personsInfoByAddressOrStationNumberDtoList;
+    }
+
+    @Override
+    public String toString() {
+        return "PersonsInfoByStationNumberListResponse{" +
+                "address='" + address + '\'' +
+                ", personsInfoByAddressOrStationNumberDtoList=" + personsInfoByAddressOrStationNumberDtoList +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PersonsInfoByStationNumberListResponse)) return false;
+        PersonsInfoByStationNumberListResponse that = (PersonsInfoByStationNumberListResponse) o;
+        return Objects.equals(address, that.address) && Objects.equals(personsInfoByAddressOrStationNumberDtoList, that.personsInfoByAddressOrStationNumberDtoList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(address, personsInfoByAddressOrStationNumberDtoList);
     }
 }

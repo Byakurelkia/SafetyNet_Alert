@@ -1,9 +1,6 @@
 package net.safety.dto;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class PersonInfoByLastNameDto
 {
@@ -78,5 +75,30 @@ public class PersonInfoByLastNameDto
 
     public void setAllergies(Set<String> allergies) {
         this.allergies = allergies;
+    }
+
+    @Override
+    public String toString() {
+        return "PersonInfoByLastNameDto{" +
+                "lastName='" + lastName + '\'' +
+                ", address='" + address + '\'' +
+                ", age=" + age +
+                ", mail='" + mail + '\'' +
+                ", medications=" + medications +
+                ", allergies=" + allergies +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PersonInfoByLastNameDto)) return false;
+        PersonInfoByLastNameDto that = (PersonInfoByLastNameDto) o;
+        return age == that.age && Objects.equals(lastName, that.lastName) && Objects.equals(address, that.address) && Objects.equals(mail, that.mail) && Objects.equals(medications, that.medications) && Objects.equals(allergies, that.allergies);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lastName, address, age, mail, medications, allergies);
     }
 }

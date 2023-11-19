@@ -3,9 +3,7 @@ package net.safety.rest_Controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import net.safety.dto.FireStationPersonsDto;
 import net.safety.model.FireStation;
-import net.safety.repository.FireStationRepository;
 import net.safety.response.ChildAndFamilyByAddressResponse;
 import net.safety.response.PersonInfoByStationNumberResponse;
 import net.safety.response.PersonsByAddressResponse;
@@ -103,7 +101,7 @@ public class FireStationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Phone numbers loaded successfully"),
             @ApiResponse(responseCode = "404", description = "This station number doesnt exist!")})
     @GetMapping("phoneAlert/{stationNumber}")
-    public ResponseEntity<List<String>> getAllPhoneNumbersByStationNumber(
+    public ResponseEntity<Set<String>> getAllPhoneNumbersByStationNumber(
             @PathVariable(value = "stationNumber") int stationNumber){
         return ResponseEntity.ok(fireStationService.getAllPhoneNumbersByStationNumber(stationNumber));
     }

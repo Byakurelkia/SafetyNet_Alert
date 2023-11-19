@@ -51,4 +51,6 @@ public class PersonInfoByStationNumberResponse {
                 ", nmbAdult=" + nmbAdult +
                 ", nmbChild=" + nmbChild ;
     }
+
+
 }

@@ -35,11 +35,11 @@ public class FireStation {
     }
 
 
-    /*@Override
+    @Override
     public String toString() {
         return "{Adress = " + address.toString() + " - " + "stationNumber =" + stationNumber +
                 '}';
-    }*/
+    }
 
     @Override
     public boolean equals(Object o) {

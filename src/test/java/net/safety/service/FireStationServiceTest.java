@@ -14,10 +14,10 @@ import net.safety.model.FireStation;
 import net.safety.model.MedicalRecord;
 import net.safety.model.Person;
 import net.safety.repository.FireStationRepository;
-import net.safety.repository.PersonRepository;
 import net.safety.response.ChildAndFamilyByAddressResponse;
 import net.safety.response.PersonInfoByStationNumberResponse;
 import net.safety.response.PersonsByAddressResponse;
+import net.safety.response.PersonsInfoByStationNumberListResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -43,7 +43,6 @@ class FireStationServiceTest {
     @Mock
     MedicalRecordService medicalRecordService;
 
-    PersonRepository personRepository = Mockito.mock(PersonRepository.class);
 
     @Test
     public void should_return_set_of_firestation() {
@@ -82,6 +81,16 @@ class FireStationServiceTest {
 
         Mockito.verify(fireStationRepository).getAllFireStations();
         assertEquals(allFireStationsSet, result);
+
+    }
+
+    @Test
+    void get_fire_station_by_address_should_throw_exception(){
+        Mockito.when(fireStationRepository.getFireStationByAddress("essai"))
+                .thenThrow(FireStationNotFoundException.class);
+
+        assertThrows(FireStationNotFoundException.class,
+                ()-> fireStationRepository.getFireStationByAddress("essai"));
 
     }
 
@@ -392,7 +401,8 @@ class FireStationServiceTest {
         Mockito.when(medicalRecordService.getMedicalRecordByNameAndLastName("firstname","lastname")).thenReturn(medicalRecordSet1);
         Mockito.when(medicalRecordService.getMedicalRecordByNameAndLastName("firstname3","lastname3")).thenReturn(medicalRecordSet2);
 
-        String expectedResult = new ChildAndFamilyByAddressResponse(childDtoList, familyList).toString();
+        //String expectedResult = new ChildAndFamilyByAddressResponse(childDtoList, familyList).toString();
+        String expectedResult = new ChildAndFamilyByAddressResponse().toString();
         String result = fireStationService.getChildAndFamilyByAddress(address).toString();
 
         Mockito.verify(personService).getPersonsByAddress(address);
@@ -437,8 +447,8 @@ class FireStationServiceTest {
         Mockito.when(personService.getPersonsByAddress(adres1)).thenReturn(personListAdressOne);
         Mockito.when(personService.getPersonsByAddress(adres2)).thenReturn(personListAdress2);
 
-        List<String> expectedResult = Arrays.asList("987456","123456","0000000");
-        List<String> result = fireStationService.getAllPhoneNumbersByStationNumber(7);
+        Set<String> expectedResult = Set.of("987456","123456","0000000");
+        Set<String> result = fireStationService.getAllPhoneNumbersByStationNumber(7);
 
         Mockito.verify(fireStationRepository).getFireStationByNumber(7);
         Mockito.verify(personService, Mockito.times(2)).getPersonsByAddress(Mockito.anyString());
@@ -510,7 +520,92 @@ class FireStationServiceTest {
     }
 
     @Test
-    public void get_person_info_by_station_number_should_return_persons_info_list(){
+    public void get_person_info_by_station_number_should_return_persons_info_list() throws ParseException {
+
+        List<FireStation> fireStationList1 = new ArrayList<>();
+        List<FireStation> fireStationList2 = new ArrayList<>();
+        List<FireStation> fireStationList3 = new ArrayList<>();
+
+        String address1 = "644 Gershwin Cir";
+        String address2 = "908 73rd St";
+        String address3 = "947 E. Rose Dr";
+
+        FireStation f1 = new FireStation(address1, 1);
+        FireStation f2 = new FireStation(address2, 2);
+        FireStation f3 = new FireStation(address3, 3);
+        fireStationList1.add(f1);
+        fireStationList2.add(f2);
+        fireStationList3.add(f3);
+
+        List<Person> pList1 = new ArrayList<>();
+        List<Person> pList2 = new ArrayList<>();
+        List<Person> pList3 = new ArrayList<>();
+        Person p1 = new Person("Peter","Duncan",address1,"Culver","jaboyd@email.com","841-874-6512","97451");
+        Person p2 = new Person("Reginold", "Walker",address2,"Culver","reg@email.com","841-874-8547", "97451");
+        Person p3 = new Person("Shawna", "Stelzer",address3,"Culver","bstel@email.com","841-874-7784", "97451");
+        pList1.add(p1);
+        pList2.add(p2);
+        pList3.add(p3);
+
+        List<String> medications = Arrays.asList("doliprane", "nurofen");
+        Set<String> allergies = new HashSet<>();
+        allergies.add("niaciline");
+        allergies.add("amoprex");
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+        String date = "01-01-1990";
+        String date2 = "01-11-2023";
+        String date3 = "11-11-2010";
+
+        Set<MedicalRecord> medicalRecordSet1 = new HashSet<>();
+        medicalRecordSet1.add(new MedicalRecord("Peter","Duncan", format.parse(date), medications,allergies));
+        Set<MedicalRecord> medicalRecordSet2 = new HashSet<>();
+        medicalRecordSet2.add(new MedicalRecord("Reginold","Walker", format.parse(date2), medications,allergies));
+        Set<MedicalRecord> medicalRecordSet3 = new HashSet<>();
+        medicalRecordSet3.add(new MedicalRecord("Shawna","Stelzer", format.parse(date3), medications,allergies));
+
+        List<PersonsInfoByAddressOrStationNumberDto> pDtoList1 = Arrays.asList(new PersonsInfoByAddressOrStationNumberDto("Duncan","841-874-6512",33,medications,allergies));
+        List<PersonsInfoByAddressOrStationNumberDto> pDtoList2 = Arrays.asList(new PersonsInfoByAddressOrStationNumberDto("Walker","841-874-8547",0,medications,allergies));
+        List<PersonsInfoByAddressOrStationNumberDto> pDtoList3 = Arrays.asList(new PersonsInfoByAddressOrStationNumberDto("Stelzer","841-874-7784",13,medications,allergies));
+
+        List<PersonsInfoByStationNumberListResponse> expectedListresult = Arrays.asList(
+                new PersonsInfoByStationNumberListResponse(address1, pDtoList1),
+                new PersonsInfoByStationNumberListResponse(address2, pDtoList2),
+                new PersonsInfoByStationNumberListResponse(address3, pDtoList3)
+        );
+
+        Mockito.when(fireStationRepository.getFireStationByNumber(1)).thenReturn(fireStationList1);
+        Mockito.when(fireStationRepository.getFireStationByNumber(2)).thenReturn(fireStationList2);
+        Mockito.when(fireStationRepository.getFireStationByNumber(3)).thenReturn(fireStationList3);
+        Mockito.when(personService.getPersonsByAddress(address1)).thenReturn(pList1);
+        Mockito.when(personService.getPersonsByAddress(address2)).thenReturn(pList2);
+        Mockito.when(personService.getPersonsByAddress(address3)).thenReturn(pList3);
+        Mockito.when(medicalRecordService.getMedicalRecordByNameAndLastName("Peter","Duncan")).thenReturn(medicalRecordSet1);
+        Mockito.when(medicalRecordService.getMedicalRecordByNameAndLastName("Reginold","Walker")).thenReturn(medicalRecordSet2);
+        Mockito.when(medicalRecordService.getMedicalRecordByNameAndLastName("Shawna","Stelzer")).thenReturn(medicalRecordSet3);
+
+        List<PersonsInfoByStationNumberListResponse> receivedResult = fireStationService.getPersonsInfoByStationNumberList(Arrays.asList(1,2,3));
+
+        Mockito.verify(personService, Mockito.times(3)).getPersonsByAddress(Mockito.anyString());
+        Mockito.verify(medicalRecordService, Mockito.times(3)).getMedicalRecordByNameAndLastName(Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(fireStationRepository, Mockito.times(3)).getFireStationByNumber(Mockito.anyInt());
+
+        assertEquals(expectedListresult.toString(),receivedResult.toString());
+
+
+
+    }
+
+    @Test
+    public void get_person_info_by_station_number_should_return_exception_caused_by_fire_station_number(){
+
+        List<Integer> intList = new ArrayList<>();
+        intList.add(20);
+
+        Mockito.when(fireStationRepository.getFireStationByNumber(20))
+                .thenThrow(FireStationNotFoundException.class);
+
+        assertThrows(FireStationNotFoundException.class,
+                ()-> fireStationService.getPersonsInfoByStationNumberList(intList));
 
     }
 }

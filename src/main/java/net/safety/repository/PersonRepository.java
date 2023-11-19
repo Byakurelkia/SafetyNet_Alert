@@ -168,7 +168,7 @@ public class PersonRepository {
         return getPerson;
     }
 
-    public Set<Person> personWithFullInformation(){
+   /* public Set<Person> personWithFullInformation(){
 
         Set<Person> personWithFullInformations = listPersons;
 
@@ -187,6 +187,6 @@ public class PersonRepository {
         });
 
         return personWithFullInformations;
-    }
+    }*/
 
 }
