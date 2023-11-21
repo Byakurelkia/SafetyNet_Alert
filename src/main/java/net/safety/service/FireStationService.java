@@ -142,7 +142,12 @@ public class FireStationService {
         logger.info("Alert Service Get Child And Family List By Address Started");
         List<ChildAndFamilyByAddressDto> childDtoList = new ArrayList<>();
         List<PersonInfoDto> familyList = new ArrayList<>();
-        List<Person> personsList = personService.getPersonsByAddress(address);
+        List<Person> personsList = new ArrayList<>();
+        try {
+            personsList = personService.getPersonsByAddress(address);
+        }catch (Exception e){
+
+        }
 
         AtomicBoolean childPresent = new AtomicBoolean(false);
 
@@ -187,7 +192,7 @@ public class FireStationService {
         personsList.forEach(p-> familyList.add(PersonMapper.INSTANCE.personToPersonInfoDto(p)));
 
         //retourne une liste vide si pas d'enfant à l'adresse mentionnée
-        if (childDtoList.isEmpty())
+        if (childDtoList.isEmpty() || personsList.isEmpty())
             return new ChildAndFamilyByAddressResponse();
         else //retourne une liste rempli si un enfant est présent à l'adresse mentionnée
             return new ChildAndFamilyByAddressResponse(childDtoList,familyList);

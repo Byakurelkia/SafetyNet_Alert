@@ -5,6 +5,7 @@ import net.safety.dto.PersonDto;
 import net.safety.dto.PersonInfoDto;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ChildAndFamilyByAddressResponse {
 
@@ -41,5 +42,18 @@ public class ChildAndFamilyByAddressResponse {
                 "childInfo=" + childAndFamilyByAddressDto +
                 ", listFamily=" + listFamily +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ChildAndFamilyByAddressResponse)) return false;
+        ChildAndFamilyByAddressResponse that = (ChildAndFamilyByAddressResponse) o;
+        return Objects.equals(childAndFamilyByAddressDto, that.childAndFamilyByAddressDto) && Objects.equals(listFamily, that.listFamily);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(childAndFamilyByAddressDto, listFamily);
     }
 }

@@ -413,14 +413,15 @@ class FireStationServiceTest {
     }
 
     @Test
-    public void get_child_and_family_by_address_should_return_exception(){
+    public void get_child_and_family_by_address_should_return_empty_lits(){
         String address = "0";
 
-        Mockito.when(personService.getPersonsByAddress(address)).thenThrow(PersonNotFoundException.class);
+        Mockito.when(personService.getPersonsByAddress(address)).thenReturn(Arrays.asList());
 
-        assertThrows(PersonNotFoundException.class,
-                ()-> fireStationService.getChildAndFamilyByAddress(address),
-                "Nobody exist in this address specified! ");
+        ChildAndFamilyByAddressResponse expectedResult = new ChildAndFamilyByAddressResponse();
+        ChildAndFamilyByAddressResponse receivedResult = fireStationService.getChildAndFamilyByAddress(address);
+
+        assertEquals(expectedResult,receivedResult);
     }
 
     @Test

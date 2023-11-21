@@ -228,15 +228,19 @@ class FireStationControllerTest {
     }
 
     @Test
-    void get_child_and_family_by_address_should_throw_exception() throws Exception {
+    void get_child_and_family_by_address_should_return_empty_object() throws Exception {
 
         String address = "NOT EXIST ADDRESS";
 
         MvcResult result = mockMvc.perform(get("/firestations/childAlert/{address}", address))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isOk())
                 .andReturn();
 
-        Assert.assertEquals("Nobody exist in this address specified! ", result.getResponse().getContentAsString());
+        ChildAndFamilyByAddressResponse expectedResult = new ChildAndFamilyByAddressResponse();
+        ChildAndFamilyByAddressResponse receivedResult = mapper
+                .readValue(result.getResponse().getContentAsString(), ChildAndFamilyByAddressResponse.class);
+
+        Assert.assertEquals(expectedResult, receivedResult);
     }
 
     @Test
